@@ -19,8 +19,5 @@ COPY . /app/
 RUN cd /app
 RUN go build -o /app/healthcheck
  
-# tells Docker that the container listens on specified network ports at runtime
-EXPOSE 8080
-
 # command to be used to execute when the image is used to start a container
 CMD [ "/app/healthcheck" ]
