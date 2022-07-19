@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"sync"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -33,32 +34,19 @@ func validateUrl(rawUrl string) (string, error) {
 	return newUrl, nil
 }
 
-func ping(rawUrl string, chnl chan healthResult) {
+func ping(rawUrl string) bool {
 	validUrl, validErr := validateUrl(rawUrl)
 	if validErr != nil {
-		chnl <- healthResult{
-			Status: false,
-			Url:    rawUrl,
-		}
-
-		return
+		return false
 	}
 
 	resp, err := http.Get(validUrl)
 	if err != nil {
-		chnl <- healthResult{
-			Status: false,
-			Url:    rawUrl,
-		}
-
-		return
+		return false
 	}
 	defer resp.Body.Close()
 
-	chnl <- healthResult{
-		Status: true,
-		Url:    rawUrl,
-	}
+	return true
 }
 
 func Upload(c *fiber.Ctx) error {
@@ -84,21 +72,27 @@ func Upload(c *fiber.Ctx) error {
 	fileScanner := bufio.NewScanner(buffer)
 	fileScanner.Split(bufio.ScanLines)
 
-	healthChan := make(chan healthResult)
-
+	var wg sync.WaitGroup
+	var healthResults []healthResult
 	for fileScanner.Scan() {
+		wg.Add(1)
+
 		urls := strings.Split(fileScanner.Text(), ",")
 		for _, url := range urls {
 			if trimedUrl := strings.TrimSpace(url); len(trimedUrl) > 0 {
-				go ping(trimedUrl, healthChan)
+				go func() {
+					defer wg.Done()
+
+					status := ping(trimedUrl)
+					healthResults = append(healthResults, healthResult{
+						Status: status,
+						Url:    trimedUrl,
+					})
+				}()
 			}
 		}
 	}
+	wg.Wait()
 
-	result := make([]healthResult, 0)
-	for h := range healthChan {
-		result = append(result, h)
-	}
-
-	return c.JSON(result)
+	return c.JSON(healthResults)
 }
