@@ -1,12 +1,19 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/assignment-go/route"
+	"github.com/assignment-go/util"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func main() {
+	config, loadError := util.LoadEnv()
+	if loadError != nil {
+		panic(loadError)
+	}
 	app := fiber.New(fiber.Config{
 		BodyLimit: 10 * 1024 * 1024, // this is the default limit of 10MB
 	})
@@ -15,8 +22,8 @@ func main() {
 
 	route.Setup(app)
 
-	listenErr := app.Listen(":3000")
+	listenErr := app.Listen(fmt.Sprintf(":%s", config.Port))
 	if listenErr != nil {
-		panic("failed to connect to port 3000")
+		panic(fmt.Sprintf("failed to connect to port %s", config.Port))
 	}
 }
