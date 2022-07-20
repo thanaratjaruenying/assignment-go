@@ -24,5 +24,5 @@ $ docker build -t go-server .
 ```
 then
 ```bash
-$ docker run -p PORT:PORT go-server
+$ docker run -it -p PORT:PORT go-server
 ```
