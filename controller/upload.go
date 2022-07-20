@@ -67,7 +67,7 @@ func ping(rawUrl string) bool {
 	}
 	defer resp.Body.Close()
 
-	if conditional := resp.StatusCode >= 200 && resp.StatusCode < 300; conditional {
+	if conditional := resp.StatusCode != 404; conditional {
 		return true
 	}
 
