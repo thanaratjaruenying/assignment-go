@@ -18,6 +18,8 @@ COPY . /app/
 # compile application
 RUN cd /app
 RUN go build -o /app/healthcheck
- 
+
+EXPOSE 8080
+
 # command to be used to execute when the image is used to start a container
 CMD [ "/app/healthcheck" ]

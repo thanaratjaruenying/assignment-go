@@ -22,7 +22,7 @@ func main() {
 
 	route.Setup(app)
 
-	listenErr := app.Listen(fmt.Sprintf(":%s", config.Port))
+	listenErr := app.Listen(":8080")
 	if listenErr != nil {
 		panic(fmt.Sprintf("failed to connect to port %s", config.Port))
 	}
