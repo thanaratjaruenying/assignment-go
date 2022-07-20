@@ -14,6 +14,16 @@ func main() {
 	if loadError != nil {
 		panic(loadError)
 	}
+
+	app := Setup()
+
+	listenErr := app.Listen(":8080")
+	if listenErr != nil {
+		panic(fmt.Sprintf("failed to connect to port %s", config.Port))
+	}
+}
+
+func Setup() *fiber.App {
 	app := fiber.New(fiber.Config{
 		BodyLimit: 10 * 1024 * 1024, // this is the default limit of 10MB
 	})
@@ -22,8 +32,5 @@ func main() {
 
 	route.Setup(app)
 
-	listenErr := app.Listen(":8080")
-	if listenErr != nil {
-		panic(fmt.Sprintf("failed to connect to port %s", config.Port))
-	}
+	return app
 }
