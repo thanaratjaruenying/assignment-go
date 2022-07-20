@@ -50,7 +50,7 @@ func ping(rawUrl string) bool {
 }
 
 func Upload(c *fiber.Ctx) error {
-	file, err := c.FormFile("fileUpload")
+	file, err := c.FormFile("file")
 
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
