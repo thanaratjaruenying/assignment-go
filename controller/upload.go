@@ -59,7 +59,7 @@ func ping(rawUrl string) bool {
 	if err != nil {
 		return false
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
 
 	if conditional := resp.StatusCode >= 200 && resp.StatusCode < 300; conditional {
 		return true
