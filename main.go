@@ -18,7 +18,7 @@ func main() {
 		BodyLimit: 10 * 1024 * 1024, // this is the default limit of 10MB
 	})
 
-	app.Use(cors.New(cors.Config{}))
+	app.Use(cors.New())
 
 	route.Setup(app)
 
