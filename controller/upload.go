@@ -18,12 +18,19 @@ type healthResult struct {
 	Url    string `json:"url"`
 }
 
-func GetHttpClient() http.Client {
-	httpClient := http.Client{
+// HTTPClient interface
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+var (
+	Client HTTPClient
+)
+
+func init() {
+	Client = &http.Client{
 		Timeout: 2 * time.Second,
 	}
-
-	return httpClient
 }
 
 func validateUrl(rawUrl string) (string, error) {
@@ -54,8 +61,7 @@ func ping(rawUrl string) bool {
 		return false
 	}
 
-	client := GetHttpClient()
-	resp, err := client.Do(req)
+	resp, err := Client.Do(req)
 	if err != nil {
 		return false
 	}
